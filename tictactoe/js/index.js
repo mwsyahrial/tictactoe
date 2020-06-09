@@ -1,5 +1,9 @@
 $("#enterBtn").click(function () {
+  checkSize();
+  checkCondition()
+  if(sizeIsOk && conIsOk){
   init();
+  }
 });
 $("#resetBtn").click(function () {
   resetGame();
@@ -11,16 +15,21 @@ var empty = "&nbsp;",
   o_win = 0,
   x_win = 0,
   moves,
-  reset = false;
+  size,
+  sizeIsOk = false,
+  winCondition = size,
+  conIsOk = false;
 
 //Initializes the Tic Tac Toe board and starts the game.
 
 function init() {
   tictactoe = document.getElementById("tictactoe");
   var board = document.createElement("table");
-  this.size = $("#enterNum").val();
+  
   board.setAttribute("border", 1);
   board.setAttribute("cellspacing", 0);
+  turn = "X";
+  document.getElementById("turn").textContent = "Player " + turn;
 
   var identifier = 1;
   for (var i = 0; i < size; i++) {
@@ -55,10 +64,34 @@ function init() {
 }
 
 function resetGame() {
-  this.reset = true;
   o_win = 0;
   x_win = 0;
+  turn = "X";
   init();
+}
+
+function checkSize(){
+  this.size = $("#enterNum").val();
+  if(size <= 0 ){
+    alert("Illegal size");
+    sizeIsOk = false;
+  } else if (size >= 100){
+    alert("Size is too big");
+    sizeIsOk = false;
+  }
+  else{
+    sizeIsOk = true;
+  }
+}
+
+function checkCondition(){
+  this.winCondition = $("#enterCon").val();
+  if(winCondition <= size && winCondition > 0){
+    conIsOk = true
+  } else {
+    alert("Illegal Winning Condition")
+    conIsOk = false;
+  }
 }
 
 // New game
@@ -78,11 +111,11 @@ function startNewGame() {
 function win(clicked) {
   // Get all cell classes
   var memberOf = clicked.className.split(/\s+/);
-  for (var i = 0; i < memberOf.length; i++) {
+  for (var i = 0; i < winCondition; i++) {
     var testClass = "." + memberOf[i];
     var items = contains("#tictactoe " + testClass, turn);
     // winning condition: turn == size
-    if (items.length == size) {
+    if (items.length == winCondition) {
       return true;
     }
   }
@@ -94,6 +127,7 @@ function win(clicked) {
 function contains(selector, text) {
   var elements = document.querySelectorAll(selector);
   return [].filter.call(elements, function (element) {
+    console.log(element)
     return RegExp(text).test(element.textContent);
   });
 }
